@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>SimplePOC - wasm user</title>
+</head>
+<body>
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script>
+        // No Razor page displayed => no OnAfterRenderAsync call at C# side => JS can't be sure when it may invoke
+        // C# mehod => do a test every 50 ms
+        // TOTHINK: limit the number of tests(?)
+        // TOCHECK: find a better way!
+        function InvokeCSharp() {
+            setTimeout(() => {
+                try {
+                    DotNet.invokeMethodAsync('wasm', 'WasmMethod', ["Hello", "outside", "world"])
+                        .then(results => console.log(`C# returned: ${results}`))
+                }
+                catch (ex) { InvokeCSharp(); }
+            }, 50);
+        }
+        InvokeCSharp();
+    </script>
+</body>
+</html>
